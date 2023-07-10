@@ -67,6 +67,8 @@ def xml_text_element(tag, value):
 def xml_config(key, val):
     return ET.Element('{%s}Config' % NS_VMW, { '{%s}required' % NS_OVF: 'false', '{%s}key' % NS_VMW: key, '{%s}value' % NS_VMW: val})
 
+def xml_property(key, val):
+    return ET.Element('{%s}Property' % NS_VMW, { '{%s}userConfigurable' % NS_OVF: 'true', '{%s}key' % NS_VMW: key, '{%s}value' % NS_VMW: val})
 
 class ValidationError(Exception):
     pass
@@ -558,6 +560,7 @@ class OVFProduct(object):
     def __init__(self, **kwargs):
         self.info = "Information about the installed software"
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in self.keys)
+        self.__dict__.update((k, v) for k, v in kwargs.items() if k.startswith('guestinfo'))
 
 
     @classmethod
@@ -569,10 +572,13 @@ class OVFProduct(object):
     def xml_item(self):
         xml_product = ET.Element('{%s}ProductSection' % NS_OVF)
 
-        for k in self.keys:
-            if hasattr(self, k) and getattr(self, k) is not None:
-                xml_name = to_camel_case(k)
-                xml_product.append(xml_text_element('{%s}%s' % (NS_OVF, xml_name), getattr(self, k)))
+        for k, v in self.__dict__.items():
+            if k in self.keys:
+                if getattr(self, k) is not None:
+                    xml_name = to_camel_case(k)
+                    xml_product.append(xml_text_element('{%s}%s' % (NS_OVF, xml_name), getattr(self, k)))
+            elif k.startswith('guestinfo'):
+                xml_product.append(xml_property(k, v))
         return xml_product
 
 
