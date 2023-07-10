@@ -68,7 +68,7 @@ def xml_config(key, val):
     return ET.Element('{%s}Config' % NS_VMW, { '{%s}required' % NS_OVF: 'false', '{%s}key' % NS_VMW: key, '{%s}value' % NS_VMW: val})
 
 def xml_property(key, val):
-    return ET.Element('{%s}Property' % NS_OVF, { '{%s}userConfigurable' % NS_OVF: 'true', '{%s}key' % NS_OVF: key, '{%s}value' % NS_OVF: val})
+    return ET.Element('{%s}Property' % NS_OVF, { '{%s}userConfigurable' % NS_OVF: 'true', '{%s}type' % NS_OVF: 'string', '{%s}key' % NS_OVF: key, '{%s}value' % NS_OVF: val})
 
 class ValidationError(Exception):
     pass
